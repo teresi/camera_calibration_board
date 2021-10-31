@@ -1,4 +1,4 @@
-% Camera calibration board with circles
+% Camera calibration board, symmetric circles
 
 % author: Michael Teresi
 
@@ -37,14 +37,16 @@
 \setlength{\paperwidth}{300mm}
 \setlength{\paperheight}{300mm}
 
-\newcommand\squareSize{54}   % circle delta
+\newcommand\gridSize{54}   % circle delta
 \newcommand\diam{40}       % circle diameter
 \newcommand\margin{\diam*1} % minimum space to edge of page
 
+% TODO use convertto instead for dimensions
 \pgfmathsetmacro\paperWmm{\paperwidth/\ptsPerMm}
 \pgfmathsetmacro\paperHmm{\paperheight/\ptsPerMm}
-\pgfmathsetmacro\numX{(\paperWmm-\margin*2)/\squareSize}
-\pgfmathsetmacro\numY{(\paperHmm-\margin*2)/\squareSize}
+\pgfmathsetmacro\numX{(\paperWmm-\margin*2)/\gridSize}
+\pgfmathsetmacro\numY{(\paperHmm-\margin*2)/\gridSize}
+
 
 \begin{document}
 \thispagestyle{empty}
@@ -59,17 +61,17 @@
 	shift={(current page.north west)}
 ]
 
-\foreach \colIndex [evaluate={\colDist=\colIndex*\squareSize}] in {0,...,\numX}
-\foreach \rowIndex [evaluate={\rowDist=\rowIndex*\squareSize}] in {0,...,\numY}
+\foreach \colIndex [evaluate={\colDist=\colIndex*\gridSize}] in {0,...,\numX}
+\foreach \rowIndex [evaluate={\rowDist=\rowIndex*\gridSize}] in {0,...,\numY}
 {
 	\coordinate (A) at ( \colDist + \margin, -\rowDist - \margin);
 	\fill [black] (A) circle (\diam/2);
 }
 
-\pgfmathsetmacro\lineWidth{\squareSize}
-\pgfmathsetmacro\textXPose{\squareSize*2+\margin}
-\pgfmathsetmacro\textYPose{\squareSize*-0.1}
-\pgfmathsetmacro\textMargin{\squareSize*0.1}
+\pgfmathsetmacro\lineWidth{\gridSize}
+\pgfmathsetmacro\textXPose{\gridSize*2+\margin}
+\pgfmathsetmacro\textYPose{\gridSize*-0.1}
+\pgfmathsetmacro\textMargin{\gridSize*0.1}
 \pgfmathtruncatemacro\numYInt{int(\numX)+1}
 \pgfmathtruncatemacro\numXInt{int(\numY)+1}
 
