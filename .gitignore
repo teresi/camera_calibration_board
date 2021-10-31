@@ -1,0 +1,16 @@
+**/*.pdf
+**/*.aux
+**/*.log
+**/*.out
+**/*.synctex.gz
+**/*.toc
+**.*~
+**.*~*
+**.*dvi
+**.*fls
+**.*fdb_latexmk
+**.*swp
+**.*idx
+**.*ilg
+**.*ind
+**.*run.xml

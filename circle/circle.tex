@@ -1,0 +1,98 @@
+% Camera calibration board with circles
+
+% author: Michael Teresi
+
+\documentclass{article}
+
+\usepackage[
+	nohead,
+	nofoot,
+	margin=0mm,
+	voffset=0mm,
+	hoffset=0mm
+]
+{geometry}
+
+\usepackage{tikz, ifthen}
+\usetikzlibrary{fit, calc}
+
+% \convertto{<unit>}{<dimension>}
+%     convert a dimension to a new unit of measurement
+% Args:
+%     <unit>:      output unit of measurement to convert to (e.g. mm)
+%     <dimension>: input value to convert (e.g. 1pt)
+\makeatletter
+%https://tex.stackexchange.com/questions/8260/what-are-the-various-units-ex-em-in-pt-bp-dd-pc-expressed-in-mm
+%http://groups.google.com/group/comp.text.tex/msg/7e812e5d6e67fcc5
+\def\convertto#1#2{\strip@pt\dimexpr #2*65536/\number\dimexpr 1#1}
+\makeatother
+
+% 1 pt in LaTeX is 1 / 72.27 inch
+% 2.845 pt/mm = 72.27 pt / 1 inch * 1 inch / 25.4 mm
+%\def\ptsPerMm{2.845275591}
+\def\ptsPerMm{\convertto{pt}{1mm}}
+
+% user input
+% TODO calculate margin in order to center the circles? (distance from paper edge to circle)
+\setlength{\paperwidth}{300mm}
+\setlength{\paperheight}{300mm}
+
+\newcommand\squareSize{54}   % circle delta
+\newcommand\diam{40}       % circle diameter
+\newcommand\margin{\diam*1} % minimum space to edge of page
+
+\pgfmathsetmacro\paperWmm{\paperwidth/\ptsPerMm}
+\pgfmathsetmacro\paperHmm{\paperheight/\ptsPerMm}
+\pgfmathsetmacro\numX{(\paperWmm-\margin*2)/\squareSize}
+\pgfmathsetmacro\numY{(\paperHmm-\margin*2)/\squareSize}
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{tikzpicture}
+[%
+	x=1mm,
+	y=1mm,
+	overlay,
+	remember picture,
+	scale=1,
+	shift={(current page.north west)}
+]
+
+\foreach \colIndex [evaluate={\colDist=\colIndex*\squareSize}] in {0,...,\numX}
+\foreach \rowIndex [evaluate={\rowDist=\rowIndex*\squareSize}] in {0,...,\numY}
+{
+	\coordinate (A) at ( \colDist + \margin, -\rowDist - \margin);
+	\fill [black] (A) circle (\diam/2);
+}
+
+\pgfmathsetmacro\lineWidth{\squareSize}
+\pgfmathsetmacro\textXPose{\squareSize*2+\margin}
+\pgfmathsetmacro\textYPose{\squareSize*-0.1}
+\pgfmathsetmacro\textMargin{\squareSize*0.1}
+\pgfmathtruncatemacro\numYInt{int(\numX)+1}
+\pgfmathtruncatemacro\numXInt{int(\numY)+1}
+
+% print the board dimensions and number of circles
+\node[align=left, font=\footnotesize] at (\textXPose, \textYPose)
+{
+	$\numXInt \; x\; \numYInt \;$
+	Board
+	\pgfmathprintnumber[fixed, precision=1]{\paperWmm}
+	$x$
+	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
+	$mm$
+};
+
+% print 
+\draw[|<->|] (\margin, \textYPose) -- node[below, font=\footnotesize]
+{ $\Delta = \lineWidth mm$} ++(\lineWidth, 0);
+
+\draw[|<->|] (-\textYPose, -\margin+\diam/2) -- node[]{} ++(0, -\diam);
+\node[left, font=\footnotesize, rotate=90] at (-\textYPose, -\margin-\diam/1.75)
+{ $\phi = \diam mm$  };
+
+\end{tikzpicture}
+
+\end{document}
+\grid
