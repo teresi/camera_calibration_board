@@ -6,8 +6,10 @@ Camera calibration boards for calculating intrinsic parameters.
 ## USAGE
 
 ```bash
-make -C circle  # symmetric circles
+make chess   # chessboard
+make circle  # symmetric circles
 ```
+
 
 ## REQUIREMENTS
 

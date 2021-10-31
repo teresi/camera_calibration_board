@@ -1,0 +1,101 @@
+% Camera calibration board, chessboard / checkerboard
+
+% author: Michael Teresi
+
+\documentclass{article}
+
+\usepackage[
+	nohead,
+	nofoot,
+	margin=0mm,
+	voffset=0mm,
+	hoffset=0mm
+]
+{geometry}
+
+\usepackage{tikz, ifthen}
+\usetikzlibrary{fit, calc}
+
+% \convertto{<unit>}{<dimension>}
+%     convert a dimension to a new unit of measurement
+% Args:
+%     <unit>:      output unit of measurement to convert to (e.g. mm)
+%     <dimension>: input value to convert (e.g. 1pt)
+\makeatletter
+%https://tex.stackexchange.com/questions/8260/what-are-the-various-units-ex-em-in-pt-bp-dd-pc-expressed-in-mm
+%http://groups.google.com/group/comp.text.tex/msg/7e812e5d6e67fcc5
+\def\convertto#1#2{\strip@pt\dimexpr #2*65536/\number\dimexpr 1#1}
+\makeatother
+
+% 1 pt in LaTeX is 1 / 72.27 inch
+% 2.845 pt/mm = 72.27 pt / 1 inch * 1 inch / 25.4 mm
+%\def\ptsPerMm{2.845275591}
+\def\ptsPerMm{\convertto{pt}{1mm}}
+
+% user input
+% TODO calculate margin in order to center the circles? (distance from paper edge to circle)
+\setlength{\paperwidth}{300mm}
+\setlength{\paperheight}{300mm}
+\newcommand\w{60}   % square length
+\newcommand\h{60}   % square length
+
+% TODO use convertto instead for dimensions
+\pgfmathsetmacro\paperWmm{\paperwidth/\ptsPerMm}
+\pgfmathsetmacro\paperHmm{\paperheight/\ptsPerMm}
+\pgfmathsetmacro\numX{\paperWmm/\w}
+\pgfmathsetmacro\numY{\paperHmm/\h}
+
+% we measure by the interior corners, so we need one more for the edges
+\pgfmathtruncatemacro\numXUp{\numX+1}
+\pgfmathtruncatemacro\numYUp{\numY+1}
+
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{tikzpicture}
+[%
+	x=1mm,
+	y=1mm,
+	overlay,
+	remember picture,
+	scale=1,
+	shift={(current page.north west)}
+]
+
+\foreach \colIndex [evaluate={\colDist=\colIndex*\w}] in {0,1,...,\numXUp}
+\foreach \rowIndex [evaluate={\rowDist=\rowIndex*\h}] in {0,1,...,\numYUp} {
+	\coordinate (A) at (\colDist, -\rowDist);
+	\coordinate (size) at (\w, \h);
+	\coordinate (B) at ($ (A) + (size) $);
+	\ifodd\colIndex
+		\ifodd\rowIndex\else
+			\fill [black] (A) rectangle (B);
+		\fi
+	\else
+		\ifodd\rowIndex
+			\fill [black] (A) rectangle (B);
+		\fi
+	\fi
+}
+
+\pgfmathsetmacro\textXPose{\w*1.5}
+\pgfmathsetmacro\textYPose{\h*-0.1}
+% subtract some epsilon to handle case where sqaure is right on edge
+% we only want the inner corners
+\pgfmathtruncatemacro\numXInner{\numX-0.01}
+\pgfmathtruncatemacro\numYInner{\numY-0.01}
+\node[align=left, font=\footnotesize] at (\textXPose, \textYPose)
+{
+	$ \w\; x\; \h\; mm$ \quad Inner $ \numXInner \; x\; \numYInner$ \\
+	Board
+	\pgfmathprintnumber[fixed, precision=1]{\paperWmm} $x$
+	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
+	$mm$
+};
+\pgfmathsetmacro\lineWidth{\w*0.5}
+\draw[|<->|] (\w*1.25, -\h*0.25) -- node[below, font=\footnotesize]{\lineWidth $mm$} ++(\lineWidth, 0);
+\end{tikzpicture}
+
+\end{document}
+\grid
