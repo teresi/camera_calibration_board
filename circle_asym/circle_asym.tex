@@ -1,0 +1,129 @@
+% Camera calibration board, asymmetric circles
+
+% author: Michael Teresi
+
+\documentclass{article}
+
+\usepackage[
+	nohead,
+	nofoot,
+	margin=0mm,
+	voffset=0mm,
+	hoffset=0mm
+]
+{geometry}
+
+\usepackage{tikz, ifthen}
+\usetikzlibrary{fit, calc}
+
+% \convertto{<unit>}{<dimension>}
+%     convert a dimension to a new unit of measurement
+% Args:
+%     <unit>:      output unit of measurement to convert to (e.g. mm)
+%     <dimension>: input value to convert (e.g. 1pt)
+\makeatletter
+%https://tex.stackexchange.com/questions/8260/what-are-the-various-units-ex-em-in-pt-bp-dd-pc-expressed-in-mm
+%http://groups.google.com/group/comp.text.tex/msg/7e812e5d6e67fcc5
+\def\convertto#1#2{\strip@pt\dimexpr #2*65536/\number\dimexpr 1#1}
+\makeatother
+
+% 1 pt in LaTeX is 1 / 72.27 inch
+% 2.845 pt/mm = 72.27 pt / 1 inch * 1 inch / 25.4 mm
+%\def\ptsPerMm{2.845275591}
+\def\ptsPerMm{\convertto{pt}{1mm}}
+
+% user input
+% TODO calculate margin in order to center the circles? (distance from paper edge to circle)
+\setlength{\paperwidth}{300mm}
+\setlength{\paperheight}{300mm}
+
+\newcommand\gridSize{50}   % circle delta
+%\newcommand\sqrt2{1.414213562}
+\newcommand\diam{30}       % circle diameter
+\newcommand\margin{\diam} % minimum space to edge of page
+\newcommand\sqrtTwo{1.414213562} % minimum space to edge of page
+
+% TODO use convertto instead for dimensions
+\pgfmathsetmacro\radius{\diam/2}
+\pgfmathsetmacro\paperWmm{\paperwidth/\ptsPerMm}
+\pgfmathsetmacro\paperHmm{\paperheight/\ptsPerMm}
+\pgfmathsetmacro\deltaCol{\gridSize*\sqrtTwo}
+\pgfmathsetmacro\deltaRow{\gridSize/\sqrtTwo}
+
+\pgfmathsetmacro\numY{(\paperHmm-\margin*2)/\deltaRow}
+% the case where the no. circles should decrease by one b/c of the shift
+% is handled below
+\pgfmathsetmacro\numX{(\paperWmm-\margin*2)/\deltaCol}
+
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{tikzpicture}
+[%
+	x=1mm,
+	y=1mm,
+	overlay,
+	remember picture,
+	scale=1,
+	shift={(current page.north west)}
+]
+
+\pgfmathsetmacro\maxColDistDraw{0}
+\foreach \colIndex [evaluate={\colDist=\colIndex*\deltaCol}] in {0,...,\numX}
+\foreach \rowIndex [evaluate={\rowDist=\rowIndex*\deltaRow}] in {0,...,\numY}
+{
+	\ifodd\rowIndex
+		\coordinate (A) at (\colDist+\margin, -\rowDist-\margin);
+		\pgfmathsetmacro\maxColDistDraw{\colDist+\diam/2}
+		\fill[black] (A) circle (\diam/2);
+	\else
+		\coordinate (A) at (\colDist+\margin+\deltaRow, -\rowDist-\margin);
+		\pgfmathsetmacro\maxColDistDraw{\colDist+\deltaRow+\diam/2}
+	\fi
+
+	\pgfmathparse{\maxColDistDraw > (\paperWmm-\margin) ? 1 : 0}
+	% if the circle won't be drawn over the edge of the page, draw the circle
+	\ifthenelse{\pgfmathresult = 0}{\fill [black] (A) circle (\diam/2);}{;}
+}
+
+\pgfmathsetmacro\lineWidth{\gridSize}
+\pgfmathsetmacro\textXPose{\gridSize*2+\margin}
+\pgfmathsetmacro\textYPose{\gridSize*-0.1}
+\pgfmathsetmacro\textMargin{\gridSize*0.1}
+\pgfmathtruncatemacro\numYInt{int(\numX)+1}
+\pgfmathtruncatemacro\numXInt{int(\numY)+1}
+
+\node[font=\footnotesize] at (\paperwidth/2+\deltaCol*2, \textYPose)
+{
+	$ \numXInt \; x\; \numYInt \; $
+	Board
+	\pgfmathprintnumber[fixed, precision=1]{\paperWmm}
+	$x$
+	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
+	$mm$
+};
+
+\draw[|<->|] (\margin+\deltaCol/2, \textYPose) -- node[]{} ++(\deltaCol, 0);
+\node[align=left, font=\footnotesize] at (\margin+\deltaRow/2, \textYPose)
+{
+	$\Delta = \pgfmathprintnumber[fixed, precision=2]{\deltaCol} mm$
+};
+
+\draw[|<->|] (\margin+\deltaRow/2, -\margin-\deltaRow/2) -- node[]{} ++(\deltaRow, -\deltaRow);
+\node[font=\footnotesize, rotate=-45] at (\margin*1.2+\deltaRow*3/2, -\margin*1.2-\deltaRow*3/2)
+{
+	$\Delta = \lineWidth mm$
+};
+
+\draw[|<->|] (\textMargin, -\margin+\radius) -- node[]{} ++(0, -\diam);
+\node[align=left, font=\footnotesize, rotate=90] at (\textMargin, -\margin-\diam)
+{
+	$\phi = \diam mm$
+};
+
+
+\end{tikzpicture}
+
+\end{document}
+\grid

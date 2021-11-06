@@ -8,6 +8,7 @@ Camera calibration boards for calculating intrinsic parameters.
 ```bash
 make chess   # chessboard
 make circle  # symmetric circles
+make asym    # asymmetric circles
 ```
 
 
@@ -27,10 +28,20 @@ I wanted boards with arbitrary dimensions so I chose TikZ.
 
 [x] add circle grid
 
-[ ] add chessboard
+[x] add chessboard
 
-[ ] add asymmetric circles
+[x] add asymmetric circles
+
+[ ] add siemens star
+
+[ ] add mini png samples to README
 
 [ ] refactor w/ a class
 
+[ ] refactor spacing, infer best grid size & center
+
 [ ] add `crop` package to show trim lines
+
+[ ] add reference line (1cm / 1 inch) for verifying print scaling
+
+[ ] add samples for A4 / letter paper
