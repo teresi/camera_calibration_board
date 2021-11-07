@@ -1,0 +1,85 @@
+% Camera calibration board, siemens star
+
+% author: Michael Teresi
+
+\documentclass{article}
+
+\usepackage[
+	nohead,
+	nofoot,
+	margin=0mm,
+	voffset=0mm,
+	hoffset=0mm
+]
+{geometry}
+
+\usepackage{tikz, ifthen}
+\usetikzlibrary{fit, calc}
+
+% \convertto{<unit>}{<dimension>}
+%     convert a dimension to a new unit of measurement
+% Args:
+%     <unit>:      output unit of measurement to convert to (e.g. mm)
+%     <dimension>: input value to convert (e.g. 1pt)
+\makeatletter
+%https://tex.stackexchange.com/questions/8260/what-are-the-various-units-ex-em-in-pt-bp-dd-pc-expressed-in-mm
+%http://groups.google.com/group/comp.text.tex/msg/7e812e5d6e67fcc5
+\def\convertto#1#2{\strip@pt\dimexpr #2*65536/\number\dimexpr 1#1}
+\makeatother
+
+% 1 pt in LaTeX is 1 / 72.27 inch
+% 2.845 pt/mm = 72.27 pt / 1 inch * 1 inch / 25.4 mm
+%\def\ptsPerMm{2.845275591}
+\def\ptsPerMm{\convertto{pt}{1mm}}
+
+% user input
+% TODO calculate margin in order to center the circles? (distance from paper edge to circle)
+\setlength{\paperwidth}{200mm}
+\setlength{\paperheight}{200mm}
+
+% number of filled sections in the star
+\newcommand\nSpokes{45}  % MAGIC 45 spokes (8 deg/cycle) is common
+% star radius
+\newcommand\radius{35}
+% percent of radius to skip before drawing
+% some targets have larger deadzones or add a filled circle at the origin
+\newcommand\deadzone{0.005}  % MAGIC depends on your printer resolution
+
+\pgfmathsetmacro\angle{180/\nSpokes}  % angle/spoke, the spokes fill *half* the circle
+
+% TODO use convertto instead for dimensions
+\pgfmathsetmacro\paperWmm{\paperwidth/\ptsPerMm}
+\pgfmathsetmacro\paperHmm{\paperheight/\ptsPerMm}
+\pgfmathsetmacro\originX{(\paperWmm/2)}
+\pgfmathsetmacro\originY{-(\paperHmm/2)}
+
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{tikzpicture}
+[%
+	x=1mm,
+	y=1mm,
+	overlay,
+	remember picture,
+	scale=1,
+	shift={(current page.north west)}
+]
+\foreach \spokeIndex [evaluate={\spoke=(\spokeIndex*2*\angle)}] in {0,...,\nSpokes}
+{
+	\pgfmathsetmacro\start{\spoke-\angle/2}
+	\pgfmathsetmacro\stop{\spoke+\angle/2}
+	\pgfmathsetmacro\x{\originX+\radius*\deadzone*cos(\spoke)}
+	\pgfmathsetmacro\y{\originY+\radius*\deadzone*sin(\spoke)}
+	\filldraw [fill=black, ultra thin]
+		(\x, \y)
+		++({\radius*cos(\start)}, {\radius*sin(\start)}) arc(\start:\stop:\radius)
+		-- (\x, \y);
+}
+
+
+\end{tikzpicture}
+
+\end{document}
+\grid

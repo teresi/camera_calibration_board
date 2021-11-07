@@ -1,14 +1,15 @@
 # CAMERA CALIBRATION BOARD
 
-Camera calibration boards for calculating intrinsic parameters.
+Camera calibration boards for calculating intrinsic parameters and etc.
 
 
 ## USAGE
 
 ```bash
-make chess   # chessboard
-make circle  # symmetric circles
-make asym    # asymmetric circles
+make chess    # chessboard
+make circle   # symmetric circles
+make asym     # asymmetric circles
+make siemens  # siemens star
 ```
 
 
@@ -21,7 +22,11 @@ Optionally use `Make`, `latexmk`.
 
 ## DESIGN
 
-I wanted boards with arbitrary dimensions so I chose TikZ.
+I wanted boards with configurable sizes.
+
+I chose TikZ because it supports physical dimensions and vector graphics, and PDFs can be printed easily.
+
+I was most interested in calculating intrinsic parameters so I added the most common targets.
 
 
 ## TODO
@@ -32,7 +37,7 @@ I wanted boards with arbitrary dimensions so I chose TikZ.
 
 [x] add asymmetric circles
 
-[ ] add siemens star
+[x] add siemens star
 
 [ ] add mini png samples to README
 
@@ -43,5 +48,7 @@ I wanted boards with arbitrary dimensions so I chose TikZ.
 [ ] add `crop` package to show trim lines
 
 [ ] add reference line (1cm / 1 inch) for verifying print scaling
+
+[ ] add reference siemens star to other types of charts
 
 [ ] add samples for A4 / letter paper
