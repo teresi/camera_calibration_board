@@ -20,7 +20,6 @@ _pdflatex_def := pdflatex %O -interaction=nonstopmode -synctex=1
 # pass options to geometry via pdflatex flag b/c we need this before \begin{document}
 _geometry_opts := \PassOptionsToPackage{paperwidth=$(WIDTH)mm,paperheight=$(HEIGHT)mm}{geometry}
 
-_pdflatex_opts := -max_print_line=96
 
 .PHONY: all clean
 .PHONY: $(_PROJECT).pdf  # delegate to latexmk b/c it needs run more than once for LaTeX

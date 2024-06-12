@@ -35,9 +35,9 @@
 % user input
 % TODO calculate margin in order to center the circles? (distance from paper edge to circle)
 \setlength{\paperwidth}{300mm}
-\setlength{\paperheight}{300mm}
-\newcommand\w{60}   % square length
-\newcommand\h{60}   % square length
+\setlength{\paperheight}{270mm}
+\newcommand\w{30}   % square length
+\newcommand\h{30}   % square length
 
 % TODO use convertto instead for dimensions
 \pgfmathsetmacro\paperWmm{\paperwidth/\ptsPerMm}
@@ -80,21 +80,21 @@
 }
 
 \pgfmathsetmacro\textXPose{\w*1.5}
-\pgfmathsetmacro\textYPose{\h*-0.1}
+\pgfmathsetmacro\textYPose{\h*-0.2}
 % subtract some epsilon to handle case where sqaure is right on edge
 % we only want the inner corners
 \pgfmathtruncatemacro\numXInner{\numX-0.01}
 \pgfmathtruncatemacro\numYInner{\numY-0.01}
 \node[align=left, font=\footnotesize] at (\textXPose, \textYPose)
 {
-	$ \w\; x\; \h\; mm$ \quad Inner $ \numXInner \; x\; \numYInner$ \\
-	Board
+	$ \w\; x\; \h\; mm$ \\
+	Inner $ \numXInner \; x\; \numYInner$ \\
 	\pgfmathprintnumber[fixed, precision=1]{\paperWmm} $x$
 	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
 	$mm$
 };
-\pgfmathsetmacro\lineWidth{\w*0.5}
-\draw[|<->|] (\w*1.25, -\h*0.25) -- node[below, font=\footnotesize]{\lineWidth $mm$} ++(\lineWidth, 0);
+\pgfmathsetmacro\lineWidth{\w}
+\draw[|<->|] (\w*3, -\h*0.25) -- node[below, font=\footnotesize]{\lineWidth $mm$} ++(\lineWidth, 0);
 \end{tikzpicture}
 
 \end{document}

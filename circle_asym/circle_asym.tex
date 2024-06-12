@@ -34,26 +34,35 @@
 
 % user input
 % TODO calculate margin in order to center the circles? (distance from paper edge to circle)
-\setlength{\paperwidth}{300mm}
-\setlength{\paperheight}{300mm}
+\setlength{\paperwidth}{254mm}
+\setlength{\paperheight}{304.8mm}
 
-\newcommand\gridSize{50}   % circle delta
+\newcommand\gridSize{64}   % circle delta from left to right (not the diagonal)
 %\newcommand\sqrt2{1.414213562}
-\newcommand\diam{30}       % circle diameter
-\newcommand\margin{\diam} % minimum space to edge of page
-\newcommand\sqrtTwo{1.414213562} % minimum space to edge of page
+\newcommand\diam{24}       % circle diameter
+\newcommand\margin{1*\diam} % minimum space to edge of page
+\newcommand\sqrtTwo{1.414213562}
 
 % TODO use convertto instead for dimensions
 \pgfmathsetmacro\radius{\diam/2}
 \pgfmathsetmacro\paperWmm{\paperwidth/\ptsPerMm}
 \pgfmathsetmacro\paperHmm{\paperheight/\ptsPerMm}
+
 \pgfmathsetmacro\deltaCol{\gridSize*\sqrtTwo}
+
 \pgfmathsetmacro\deltaRow{\gridSize/\sqrtTwo}
 
-\pgfmathsetmacro\numY{(\paperHmm-\margin*2)/\deltaRow}
+
 % the case where the no. circles should decrease by one b/c of the shift
 % is handled below
-\pgfmathsetmacro\numX{(\paperWmm-\margin*2)/\deltaCol}
+\pgfmathsetmacro\diag{\gridSize/\sqrtTwo}
+
+\pgfmathtruncatemacro\numX{(\paperWmm-\margin*2)/\gridSize}
+\pgfmathsetmacro\xoffset{(\paperWmm-\numX*\gridSize-\diam)/2}
+
+\pgfmathtruncatemacro\numY{(\paperHmm-\margin*2-\diag)/\gridSize}
+\pgfmathsetmacro\yoffset{(\paperHmm-\numY*\gridSize-\gridSize/2-\diam)/2}
+
 
 
 \begin{document}
@@ -69,22 +78,25 @@
 	shift={(current page.north west)}
 ]
 
-\pgfmathsetmacro\maxColDistDraw{0}
-\foreach \colIndex [evaluate={\colDist=\colIndex*\deltaCol}] in {0,...,\numX}
-\foreach \rowIndex [evaluate={\rowDist=\rowIndex*\deltaRow}] in {0,...,\numY}
-{
-	\ifodd\rowIndex
-		\coordinate (A) at (\colDist+\margin, -\rowDist-\margin);
-		\pgfmathsetmacro\maxColDistDraw{\colDist+\diam/2}
-		\fill[black] (A) circle (\diam/2);
-	\else
-		\coordinate (A) at (\colDist+\margin+\deltaRow, -\rowDist-\margin);
-		\pgfmathsetmacro\maxColDistDraw{\colDist+\deltaRow+\diam/2}
-	\fi
+% NB first we draw the grid
+% then draw again with then offset of 1/2 grid with one less column
+% b/c the diagram *must* not be symmetric in order for openCV to find the orientation
+% e.g. think of it that the 'corners' are on the top, and the 'rounded corners' are on the bottom
 
-	\pgfmathparse{\maxColDistDraw > (\paperWmm-\margin) ? 1 : 0}
-	% if the circle won't be drawn over the edge of the page, draw the circle
-	\ifthenelse{\pgfmathresult = 0}{\fill [black] (A) circle (\diam/2);}{;}
+\pgfmathsetmacro\maxColDistDraw{0}
+\foreach \colIndex [evaluate={\colDist=\colIndex*\gridSize+\xoffset+\radius}] in {0,...,\numX}
+\foreach \rowIndex [evaluate={\rowDist=\rowIndex*\gridSize+\yoffset+\radius}] in {0,...,\numY}
+{
+	\coordinate (A) at (\colDist, -\rowDist);
+	\fill [black] (A) circle (\radius);
+}
+
+\pgfmathsetmacro\numXminusone{\numX-1}
+\foreach \colIndex [evaluate={\colDist=\colIndex*\gridSize+\xoffset+\radius}] in {0,...,\numXminusone}
+\foreach \rowIndex [evaluate={\rowDist=\rowIndex*\gridSize+\yoffset+\radius}] in {0,...,\numY}
+{
+	\coordinate (A) at (\colDist+\gridSize/2, -\rowDist-\gridSize/2);
+	\fill [black] (A) circle (\radius);
 }
 
 \pgfmathsetmacro\lineWidth{\gridSize}
@@ -94,32 +106,52 @@
 \pgfmathtruncatemacro\numYInt{int(\numX)+1}
 \pgfmathtruncatemacro\numXInt{int(\numY)+1}
 
-\node[font=\footnotesize] at (\paperwidth/2+\deltaCol*2, \textYPose)
+% NB by OpenCV convention, the row count is the no. of rows w/o the 1/2 grid offset
+% but the no. of cols includes the 2nd grid drawn at the 1/2 offset
+% MAGIC adding 1 to each of these b/c it's a count not an index
+\pgfmathtruncatemacro\numRows{\numY+1}
+\pgfmathtruncatemacro\numCols{\numX+1+\numXminusone+1}
+%
+
+\node[font=\footnotesize] at (\xoffset+\diam, -\yoffset-\numY*\gridSize-\gridSize)
 {
-	$ \numXInt \; x\; \numYInt \; $
-	Board
+	$ \numRows\; x\; \numCols \; $
+	Board,
 	\pgfmathprintnumber[fixed, precision=1]{\paperWmm}
 	$x$
 	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
 	$mm$
 };
 
-\draw[|<->|] (\margin+\deltaCol/2, \textYPose) -- node[]{} ++(\deltaCol, 0);
-\node[align=left, font=\footnotesize] at (\margin+\deltaRow/2, \textYPose)
-{
-	$\Delta = \pgfmathprintnumber[fixed, precision=2]{\deltaCol} mm$
-};
 
-\draw[|<->|] (\margin+\deltaRow/2, -\margin-\deltaRow/2) -- node[]{} ++(\deltaRow, -\deltaRow);
-\node[font=\footnotesize, rotate=-45] at (\margin*1.2+\deltaRow*3/2, -\margin*1.2-\deltaRow*3/2)
-{
-	$\Delta = \lineWidth mm$
-};
 
-\draw[|<->|] (\textMargin, -\margin+\radius) -- node[]{} ++(0, -\diam);
-\node[align=left, font=\footnotesize, rotate=90] at (\textMargin, -\margin-\diam)
+%
+%\draw[|<->|] (\margin+\deltaCol/2, \textYPose) -- node[]{} ++(\deltaCol, 0);
+%\node[align=left, font=\footnotesize] at (\margin+\deltaRow/2, \textYPose)
+%{
+%	$\Delta = \pgfmathprintnumber[fixed, precision=2]{\deltaCol} mm$
+%};
+%
+
+%\draw[|<->|] (\xoffset+\radius+\gridSize*1/4, -\yoffset-\radius-\gridSize*3/4) -- node[]{} ++(\gridSize/2, -\gridSize/2);
+%\node[font=\footnotesize, rotate=-45] at (\margin*1.2+\deltaRow*3/2, -\margin*1.2-\deltaRow*3/2)
+%{
+%	$\Delta = \diag$
+%};
+
+% top left corner, diameter
+\draw[|<->|] (\xoffset, -\margin) -- node[]{} ++(\diam, 0);
+\node[align=left, font=\footnotesize] at (\xoffset+1.6*\diam, -\margin)
 {
 	$\phi = \diam mm$
+};
+
+
+ right of diameter, spacing
+\draw[|<->|] (\xoffset+\gridSize+\radius, -\margin) -- node[]{} ++(\gridSize, 0);
+\node[font=\footnotesize] at (\xoffset+\gridSize*2+\diam, -\margin)
+{
+	$\Delta = \gridSize mm$
 };
 
 

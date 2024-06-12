@@ -41,6 +41,8 @@
 %\def\ptsPerMm{2.845275591}
 \def\ptsPerMm{\convertto{pt}{1mm}}
 
+\setlength{\paperwidth}{300mm}
+\setlength{\paperheight}{270mm}
 
 \begin{document}
 
@@ -56,8 +58,8 @@
 
 \ifdefined\radius
 \else
-	% MAGIC user prefence, 90 of page with 
-	\pgfmathsetmacro\radius{\paperwidth*0.45/\ptsPerMm}
+	% MAGIC user prefence, 90 of page with
+	\pgfmathsetmacro\radius{\paperwidth*0.40/\ptsPerMm}
 \fi
 
 
