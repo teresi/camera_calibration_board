@@ -41,8 +41,8 @@
 %\def\ptsPerMm{2.845275591}
 \def\ptsPerMm{\convertto{pt}{1mm}}
 
-\setlength{\paperwidth}{300mm}
-\setlength{\paperheight}{270mm}
+\setlength{\paperwidth}{86.36mm}
+\setlength{\paperheight}{53.34mm}
 
 \begin{document}
 
@@ -59,7 +59,7 @@
 \ifdefined\radius
 \else
 	% MAGIC user prefence, 90 of page with
-	\pgfmathsetmacro\radius{\paperwidth*0.40/\ptsPerMm}
+	\pgfmathsetmacro\radius{\paperwidth*0.48/\ptsPerMm}
 \fi
 
 
@@ -90,10 +90,11 @@
 	\filldraw [fill=black, ultra thin]
 		(current page.center)
 		++({\radius*cos(\start)}, {\radius*sin(\start)}) arc(\start:\stop:\radius)
-		-- (current page.center);
+		-- (current page.center)
+		-- cycle;
 };
 % MAGIC experimental circle radius, depends on your printer
-\filldraw[white] (current page.center) circle (0.5pt);
+\filldraw[white] (current page.center) circle (0.1pt);
 \end{tikzpicture}%
 
 

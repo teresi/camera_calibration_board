@@ -34,13 +34,17 @@
 
 % user input
 % TODO calculate margin in order to center the circles? (distance from paper edge to circle)
-\setlength{\paperwidth}{254mm}
-\setlength{\paperheight}{304.8mm}
+%\setlength{\paperwidth}{254mm}
+%\setlength{\paperheight}{304.8mm}
 
-\newcommand\gridSize{64}   % circle delta from left to right (not the diagonal)
+\setlength{\paperwidth}{86.36mm}
+\setlength{\paperheight}{53.34mm}
+
+\newcommand\gridSize{16}   % circle delta from left to right (not the diagonal)
 %\newcommand\sqrt2{1.414213562}
-\newcommand\diam{24}       % circle diameter
-\newcommand\margin{1*\diam} % minimum space to edge of page
+\newcommand\diam{8}       % circle diameter
+%\newcommand\margin{0.64*\diam} % minimum space to edge of page
+\newcommand\margin{4} % minimum space to edge of page
 \newcommand\sqrtTwo{1.414213562}
 
 % TODO use convertto instead for dimensions
@@ -113,15 +117,16 @@
 \pgfmathtruncatemacro\numCols{\numX+1+\numXminusone+1}
 %
 
-\node[font=\footnotesize] at (\xoffset+\diam, -\yoffset-\numY*\gridSize-\gridSize)
-{
-	$ \numRows\; x\; \numCols \; $
-	Board,
-	\pgfmathprintnumber[fixed, precision=1]{\paperWmm}
-	$x$
-	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
-	$mm$
-};
+%\node[font=\footnotesize] at (2*\xoffset+\diam, -\yoffset-\numY*\gridSize-\gridSize)
+%\node[font=\footnotesize,rotate=90] at (3, -26)
+%{
+%	$ \numRows\; x\; \numCols \; $
+%	Board,
+%	\pgfmathprintnumber[fixed, precision=1]{\paperWmm}
+%	$x$
+%	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
+%	$mm$
+%};
 
 
 
@@ -140,19 +145,31 @@
 %};
 
 % top left corner, diameter
-\draw[|<->|] (\xoffset, -\margin) -- node[]{} ++(\diam, 0);
-\node[align=left, font=\footnotesize] at (\xoffset+1.6*\diam, -\margin)
-{
-	$\phi = \diam mm$
-};
+%\draw[|<->|] (\xoffset, -\margin) -- node[]{} ++(\diam, 0);
+%\node[align=left, font=\footnotesize] at (\xoffset+1.8*\diam, -\margin)
+%{
+%	$\phi \diam mm$
+%};
 
 
- right of diameter, spacing
-\draw[|<->|] (\xoffset+\gridSize+\radius, -\margin) -- node[]{} ++(\gridSize, 0);
-\node[font=\footnotesize] at (\xoffset+\gridSize*2+\diam, -\margin)
-{
-	$\Delta = \gridSize mm$
-};
+% right of diameter, spacing
+%\draw[|<->|] (\xoffset+\gridSize+\radius, -\margin) -- node[]{} ++(\gridSize, 0);
+%\node[font=\footnotesize] at (2.0*\xoffset+\gridSize*2+\diam, -\margin)
+%{
+%	$\Delta \gridSize mm$
+%};
+
+
+%% the laser can't handle text! remove the text
+%%\node[font=\footnotesize] at (2*\xoffset+\diam, -\yoffset-\numY*\gridSize-\gridSize)
+%\node[font=\footnotesize,rotate=90] at (\paperwidth-6.5, -28)
+%{
+%	$ \numRows\; x\; \numCols \; $
+%	\hskip1em
+%	$\phi \diam mm$
+%	\hskip1em
+%	$\Delta \gridSize mm$
+%};
 
 
 \end{tikzpicture}
