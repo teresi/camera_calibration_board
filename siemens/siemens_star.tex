@@ -87,10 +87,11 @@
 	\pgfmathsetmacro\start{\spoke-\angle/2}
 	\pgfmathsetmacro\stop{\spoke+\angle/2}
 
-	\filldraw [fill=black, ultra thin]
+	\filldraw [fill=black, draw=black]
 		(current page.center)
-		++({\radius*cos(\start)}, {\radius*sin(\start)}) arc(\start:\stop:\radius)
-		-- (current page.center);
+		-- +({\radius*cos(\start)}, {\radius*sin(\start)})
+		-- +({\radius*cos(\stop)}, {\radius*sin(\stop)})
+		-- cycle;
 };
 % MAGIC experimental circle radius, depends on your printer
 \filldraw[white] (current page.center) circle (0.5pt);

@@ -34,12 +34,16 @@
 
 % user input
 % TODO calculate margin in order to center the circles? (distance from paper edge to circle)
-\setlength{\paperwidth}{254mm}
-\setlength{\paperheight}{304.8mm}
+%\setlength{\paperwidth}{254mm}
+%\setlength{\paperheight}{304.8mm}
 
-\newcommand\gridSize{64}   % circle delta from left to right (not the diagonal)
-%\newcommand\sqrt2{1.414213562}
+%\setlength{\paperwidth}{254mm}
+%\setlength{\paperheight}{304.8mm}
+
 \newcommand\diam{24}       % circle diameter
+\newcommand\gridSize{64}   % circle delta from left to right (not the diagonal)
+
+%\newcommand\sqrt2{1.414213562}
 \newcommand\margin{1*\diam} % minimum space to edge of page
 \newcommand\sqrtTwo{1.414213562}
 
@@ -113,46 +117,47 @@
 \pgfmathtruncatemacro\numCols{\numX+1+\numXminusone+1}
 %
 
-\node[font=\footnotesize] at (\xoffset+\diam, -\yoffset-\numY*\gridSize-\gridSize)
-{
-	$ \numRows\; x\; \numCols \; $
-	Board,
-	\pgfmathprintnumber[fixed, precision=1]{\paperWmm}
-	$x$
-	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
-	$mm$
-};
-
-
-
-%
-%\draw[|<->|] (\margin+\deltaCol/2, \textYPose) -- node[]{} ++(\deltaCol, 0);
-%\node[align=left, font=\footnotesize] at (\margin+\deltaRow/2, \textYPose)
+%\node[font=\footnotesize] at (\xoffset+\diam, -\yoffset-\numY*\gridSize-\gridSize)
 %{
-%	$\Delta = \pgfmathprintnumber[fixed, precision=2]{\deltaCol} mm$
+%	$ \numRows\; x\; \numCols \; $
+%	Board,
+%	\pgfmathprintnumber[fixed, precision=1]{\paperWmm}
+%	$x$
+%	\pgfmathprintnumber[fixed, precision=1]{\paperHmm}
+%	$mm$
 %};
 %
-
-%\draw[|<->|] (\xoffset+\radius+\gridSize*1/4, -\yoffset-\radius-\gridSize*3/4) -- node[]{} ++(\gridSize/2, -\gridSize/2);
-%\node[font=\footnotesize, rotate=-45] at (\margin*1.2+\deltaRow*3/2, -\margin*1.2-\deltaRow*3/2)
+%
+%
+%%
+%%\draw[|<->|] (\margin+\deltaCol/2, \textYPose) -- node[]{} ++(\deltaCol, 0);
+%%\node[align=left, font=\footnotesize] at (\margin+\deltaRow/2, \textYPose)
+%%{
+%%	$\Delta = \pgfmathprintnumber[fixed, precision=2]{\deltaCol} mm$
+%%};
+%%
+%
+%%\draw[|<->|] (\xoffset+\radius+\gridSize*1/4, -\yoffset-\radius-\gridSize*3/4) -- node[]{} ++(\gridSize/2, -\gridSize/2);
+%%\node[font=\footnotesize, rotate=-45] at (\margin*1.2+\deltaRow*3/2, -\margin*1.2-\deltaRow*3/2)
+%%{
+%%	$\Delta = \diag$
+%%};
+%
+%
+%% top left corner, diameter
+%\draw[|<->|] (\xoffset, -\margin) -- node[]{} ++(\diam, 0);
+%\node[align=left, font=\footnotesize] at (\xoffset+1.6*\diam, -\margin)
 %{
-%	$\Delta = \diag$
+%	$\phi = \diam mm$
 %};
-
-% top left corner, diameter
-\draw[|<->|] (\xoffset, -\margin) -- node[]{} ++(\diam, 0);
-\node[align=left, font=\footnotesize] at (\xoffset+1.6*\diam, -\margin)
-{
-	$\phi = \diam mm$
-};
-
-
- right of diameter, spacing
-\draw[|<->|] (\xoffset+\gridSize+\radius, -\margin) -- node[]{} ++(\gridSize, 0);
-\node[font=\footnotesize] at (\xoffset+\gridSize*2+\diam, -\margin)
-{
-	$\Delta = \gridSize mm$
-};
+%
+%
+% right of diameter, spacing
+%\draw[|<->|] (\xoffset+\gridSize+\radius, -\margin) -- node[]{} ++(\gridSize, 0);
+%\node[font=\footnotesize] at (\xoffset+\gridSize*2+\diam, -\margin)
+%{
+%	$\Delta = \gridSize mm$
+%};
 
 
 \end{tikzpicture}
