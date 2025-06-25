@@ -27,7 +27,7 @@ _geometry_opts := \PassOptionsToPackage{paperwidth=$(WIDTH)mm,paperheight=$(HEIG
 # 		-pdflatex='pdflatex -interaction=nonstopmode -shell-escape "\newcommand\nSpokes{$(SPOKES)} \include{$(_PROJECT)}"' \
 
 .PHONY: all
-all: $(_PROJECT).pdf
+all: $(_PROJECT).pdf $(_PROJECT).svg $(_PROJECT).png
 
 
 $(_PROJECT).pdf:
@@ -39,3 +39,12 @@ $(_PROJECT).pdf:
 .PHONY: clean
 clean:
 	latexmk -C $(_PROJECT).tex
+
+
+$(_PROJECT).svg: $(_PROJECT).pdf
+	pdf2svg $< $@
+
+
+$(_PROJECT).png: $(_PROJECT).pdf
+	# -r is DPI, experimental
+	pdftoppm $< $(basename $@) -png -singlefile -r 512

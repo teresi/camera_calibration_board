@@ -8,41 +8,37 @@
 %    pass options on command line instead and use `current page.center`
 
 
-\documentclass[oneside]{article}
+\documentclass{article}
 
 % NB do not set paperwidth, paperheight here b/c they are NOT
 %    overridden by the command line options
 \usepackage[
-	ignoreall,
-	hmargin=0pt,
-	vmargin=0pt,
-	noheadfoot,
-	nomarginpar,
-	offset=0pt,
+	nohead,
+	nofoot,
+	margin=0mm,
+	voffset=0mm,
+	hoffset=0mm
 ]
 {geometry}
 
 \usepackage{tikz, ifthen}
 \usetikzlibrary{fit, calc}
 
-% \convertto{<unit>}{<dimension>}
-%     convert a dimension to a new unit of measurement
-% Args:
-%     <unit>:      output unit of measurement to convert to (e.g. mm)
-%     <dimension>: input value to convert (e.g. 1pt)
-\makeatletter
-%https://tex.stackexchange.com/questions/8260/what-are-the-various-units-ex-em-in-pt-bp-dd-pc-expressed-in-mm
-%http://groups.google.com/group/comp.text.tex/msg/7e812e5d6e67fcc5
-\def\convertto#1#2{\strip@pt\dimexpr#2*65536/\number\dimexpr 1#1}
-\makeatother
 
-% 1 pt in LaTeX is 1 / 72.27 inch
-% 2.845 pt/mm = 72.27 pt / 1 inch * 1 inch / 25.4 mm
-%\def\ptsPerMm{2.845275591}
-\def\ptsPerMm{\convertto{pt}{1mm}}
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% in mm, but don't use units! it messes up TikZ
 
-\setlength{\paperwidth}{86.36mm}
-\setlength{\paperheight}{53.34mm}
+\newcommand{\width}{86.36}  % business card, 86x53
+\newcommand{\height}{53.34} % business card, 86x53
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\setlength{\paperwidth}{\width mm}    % tell LaTeX the units for the page
+\setlength{\paperheight}{\height mm}  % tell LaTeX the units for the page
+
+\pgfmathsetmacro\paperW{\width}
+\pgfmathsetmacro\paperH{\height}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
 \begin{document}
 
@@ -59,21 +55,14 @@
 \ifdefined\radius
 \else
 	% MAGIC user prefence, 90 of page with
-	\pgfmathsetmacro\radius{\paperwidth*0.48/\ptsPerMm}
+	\pgfmathsetmacro\radius{0.499*\width}
 \fi
 
 
-% draw squares eminating from center
-% usefule for finding center of page / positioning
-%\begin{tikzpicture}[remember picture,overlay]
-%	\begin{scope}[color=gray,line width=1pt]
-%\foreach \shift in {1cm,2cm,3cm,4cm,5cm,6cm,7cm,8cm,9cm,10cm,11cm,12cm,13cm,14cm}
-%	  \draw ([xshift=-\shift,yshift=\shift]current page.center) rectangle ([xshift=\shift,yshift=-\shift]current page.center);
-%	\end{scope}
-%\end{tikzpicture}
-
-
 \pgfmathsetmacro\angle{360.0/2/\nSpokes}  % spokes fill *half* the circle
+\pgfmathsetmacro\cx{\paperW/2}
+\pgfmathsetmacro\cy{\paperH/2}
+
 \begin{tikzpicture}
 [%
 	x=1mm,
@@ -81,20 +70,37 @@
 	overlay,
 	remember picture,
 	scale=1,
+	radius=\radius,
+	delta angle=\angle,
+	shift={(current page.south west)}
 ]
+%\draw [help lines] (0,0) grid[xstep=2,ystep=2] (\paperW,\paperH);
+
 \foreach \spokeIndex [evaluate={\spoke=(\spokeIndex*2*\angle)}] in {0,...,\nSpokes}
 {
 	\pgfmathsetmacro\start{\spoke-\angle/2}
 	\pgfmathsetmacro\stop{\spoke+\angle/2}
+	\begin{scope}
+	\clip (0,0) rectangle (\width, \height/2);
+	\filldraw [fill=black, ultra thin] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
+	\end{scope}
+}
+% HACK for some reason, clipping does *not* work when in SVG if it's the whole page
+% the clip looks good in the PDF, but not all the spokes get clipped in the SVG.
+% *however* it does clip properly in the SVG we clip half the page!
+% since the CNC reads the PDF as an SVG, draw twice w/ the clip moved to force the SVG to get clipped
+\foreach \spokeIndex [evaluate={\spoke=(\spokeIndex*2*\angle)}] in {0,...,\nSpokes}
+{
+	\pgfmathsetmacro\start{\spoke-\angle/2}
+	\pgfmathsetmacro\stop{\spoke+\angle/2}
+	\begin{scope}
+	\clip (0, \height/2) rectangle (\width, \height);
+	\filldraw [fill=black, ultra thin] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
+	\end{scope}
+}
 
-	\filldraw [fill=black, ultra thin]
-		(current page.center)
-		++({\radius*cos(\start)}, {\radius*sin(\start)}) arc(\start:\stop:\radius)
-		-- (current page.center)
-		-- cycle;
-};
-% MAGIC experimental circle radius, depends on your printer
-\filldraw[white] (current page.center) circle (0.1pt);
+% MAGIC draw a white circle so that it's easier to print on paper
+%\filldraw[white] (\paperW/2, \paperH/2) circle (0.1pt);
 \end{tikzpicture}%
 
 
