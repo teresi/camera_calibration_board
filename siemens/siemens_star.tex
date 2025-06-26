@@ -82,7 +82,7 @@
 	\pgfmathsetmacro\stop{\spoke+\angle/2}
 	\begin{scope}
 	\clip (0,0) rectangle (\width, \height/2);
-	\filldraw [fill=black, ultra thin] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
+	\filldraw [fill=black, line width=0.001pt] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
 	\end{scope}
 }
 % HACK for some reason, clipping does *not* work when in SVG if it's the whole page
@@ -95,7 +95,7 @@
 	\pgfmathsetmacro\stop{\spoke+\angle/2}
 	\begin{scope}
 	\clip (0, \height/2) rectangle (\width, \height);
-	\filldraw [fill=black, ultra thin] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
+	\filldraw [fill=black, line width=0.001pt] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
 	\end{scope}
 }
 
