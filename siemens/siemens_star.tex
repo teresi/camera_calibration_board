@@ -7,6 +7,10 @@
 %    where tikz page center was not actually in center of page
 %    pass options on command line instead and use `current page.center`
 
+% NB clipping is available but not recommended
+%    drawing with clipping sometimes results in areas that don't get drawn correctly
+%    clipping is ignored by the CNC, it appears the clip is not part of the SVG
+
 
 \documentclass{article}
 
@@ -22,7 +26,7 @@
 {geometry}
 
 \usepackage{tikz, ifthen}
-\usetikzlibrary{fit, calc}
+\usetikzlibrary{fit, calc, shapes, backgrounds}
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -35,33 +39,59 @@
 \setlength{\paperwidth}{\width mm}    % tell LaTeX the units for the page
 \setlength{\paperheight}{\height mm}  % tell LaTeX the units for the page
 
-\pgfmathsetmacro\paperW{\width}
-\pgfmathsetmacro\paperH{\height}
+\pgfmathsetmacro{\paperW}{\width}
+\pgfmathsetmacro{\paperH}{\height}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
+
+% FUTURE add elipse siemens star
+% radius, number spokes, x, y
+\newcommand{\siemenstar}[4]
+{
+	\pgfmathsetmacro{\radius}{#1}
+	\pgfmathsetmacro{\nSpokes}{#2}  % MAGIC 8deg / spoke appears to be common
+	\pgfmathsetmacro{\cx}{#3}
+	\pgfmathsetmacro{\cy}{#4}
+	\pgfmathsetmacro{\angle}{360/2/\nSpokes}  % spokes fill *half* the circle
+
+	\begin{tikzpicture}
+		[%
+			x=1mm,
+			y=1mm,
+			overlay,
+			remember picture,
+			scale=1,
+			radius=\radius,
+			delta angle=\angle,
+			shift={(current page.south west)}
+		]
+
+		% NOTE previously using clipping, but the CNC ignores clipping on and SVG
+		\foreach \spokeIndex [evaluate={\spoke=(\spokeIndex*2*\angle)}] in {0,...,\nSpokes}
+		{
+			\pgfmathsetmacro{\start}{\spoke-\angle/2}
+			\pgfmathsetmacro{\stop}{\spoke+\angle/2}
+			\begin{scope}
+			\filldraw [fill=black, line width=0.001pt] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
+			\end{scope}
+		}
+	\end{tikzpicture}%
+}
+
+
+
 \begin{document}
 
-% provides input variables
-% nSpokes    number of filled sections in the star, aka spoke target, (45)
-% radius     radius in mm of the spokes (45% of pagewidth)
-\IfFileExists{options}{\input{options}}{}
-
-\ifdefined\nSpokes
-\else
-	\newcommand\nSpokes{45}  % MAGIC 8deg / spoke appears to be common
-\fi
-
-\ifdefined\radius
-\else
-	% MAGIC user prefence, 90 of page with
-	\pgfmathsetmacro\radius{0.499*\width}
-\fi
+%\newcommand\nSpokes{45}  % MAGIC 8deg / spoke appears to be common
+%\newcommand\radius{0.499*\height}
+\newcommand\cx{\width/2}
+\newcommand\cy{\height/2}
+% MAGIC using a radius the size of the height b/c we don't want the laser to go past the card,
+% and the clipping didn't work in the SVG to limit the output dimensions
+\newcommand\radius{\height/2-1}  % MAGIC 1mm margin
 
 
-\pgfmathsetmacro\angle{360.0/2/\nSpokes}  % spokes fill *half* the circle
-\pgfmathsetmacro\cx{\paperW/2}
-\pgfmathsetmacro\cy{\paperH/2}
 
 \begin{tikzpicture}
 [%
@@ -70,34 +100,19 @@
 	overlay,
 	remember picture,
 	scale=1,
-	radius=\radius,
-	delta angle=\angle,
 	shift={(current page.south west)}
 ]
 %\draw [help lines] (0,0) grid[xstep=2,ystep=2] (\paperW,\paperH);
 
-\foreach \spokeIndex [evaluate={\spoke=(\spokeIndex*2*\angle)}] in {0,...,\nSpokes}
-{
-	\pgfmathsetmacro\start{\spoke-\angle/2}
-	\pgfmathsetmacro\stop{\spoke+\angle/2}
-	\begin{scope}
-	\clip (0,0) rectangle (\width, \height/2);
-	\filldraw [fill=black, line width=0.001pt] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
-	\end{scope}
-}
-% HACK for some reason, clipping does *not* work when in SVG if it's the whole page
-% the clip looks good in the PDF, but not all the spokes get clipped in the SVG.
-% *however* it does clip properly in the SVG we clip half the page!
-% since the CNC reads the PDF as an SVG, draw twice w/ the clip moved to force the SVG to get clipped
-\foreach \spokeIndex [evaluate={\spoke=(\spokeIndex*2*\angle)}] in {0,...,\nSpokes}
-{
-	\pgfmathsetmacro\start{\spoke-\angle/2}
-	\pgfmathsetmacro\stop{\spoke+\angle/2}
-	\begin{scope}
-	\clip (0, \height/2) rectangle (\width, \height);
-	\filldraw [fill=black, line width=0.001pt] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
-	\end{scope}
-}
+% MAGIC 45 spokes is common, adjust to your size and what looks good
+\siemenstar{\radius}{64}{\cx}{\cy}
+
+% fill the corners with smaller stars to fill the space and help us align the drawing to the card in the CNC bed
+% MAGIC experimental margin
+\siemenstar{9}{32}{10}{10}
+\siemenstar{9}{32}{10}{\height-10}
+\siemenstar{9}{32}{\width-10}{10}
+\siemenstar{9}{32}{\width-10}{\height-10}
 
 % MAGIC draw a white circle so that it's easier to print on paper
 %\filldraw[white] (\paperW/2, \paperH/2) circle (0.1pt);
