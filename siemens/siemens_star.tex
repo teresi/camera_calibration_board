@@ -31,7 +31,6 @@
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % in mm, but don't use units! it messes up TikZ
-
 \newcommand{\width}{86.36}  % business card, 86x53
 \newcommand{\height}{53.34} % business card, 86x53
 
@@ -66,14 +65,15 @@
 			delta angle=\angle,
 			shift={(current page.south west)}
 		]
-
-		% NOTE previously using clipping, but the CNC ignores clipping on and SVG
-		\foreach \spokeIndex [evaluate={\spoke=(\spokeIndex*2*\angle)}] in {0,...,\nSpokes}
+	   % NOTE: previously using clipping, but the CNC ignores clipping on and SVG (?)
+	   % MAGIC: starting at 1 b/c otherwise it draws 2 spokes on the first/last,
+	   % and overlapping paths causes the CNC to not draw it (?)
+		\foreach \spokeIndex [evaluate={\spoke=(\spokeIndex*2*\angle)}] in {1,...,\nSpokes}
 		{
 			\pgfmathsetmacro{\start}{\spoke-\angle/2}
 			\pgfmathsetmacro{\stop}{\spoke+\angle/2}
 			\begin{scope}
-			\filldraw [fill=black, line width=0.001pt] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
+				\filldraw [fill=black, line width=0.001pt] (\cx, \cy) -- +({\radius*cos(\start)}, {\radius*sin(\start)}) arc[start angle=\start] -- cycle;
 			\end{scope}
 		}
 	\end{tikzpicture}%
@@ -104,14 +104,16 @@
 ]
 %\draw [help lines] (0,0) grid[xstep=2,ystep=2] (\paperW,\paperH);
 
-% MAGIC 45 spokes is common, adjust to your size and what looks good
-\siemenstar{\radius}{64}{\cx}{\cy}
+% MAGIC: experimental number of spokes, depends on capabilities of CNC, 45 is a commount count
+% TODO: calculate radius & position based on paperwidth & paperheight
+\siemenstar{\radius}{40}{\cx}{\cy}
 
 % fill the corners with smaller stars to fill the space and help us align the drawing to the card in the CNC bed
-% MAGIC experimental margin
-\siemenstar{9}{32}{10}{10}
-\siemenstar{9}{32}{10}{\height-10}
-\siemenstar{9}{32}{\width-10}{10}
+% MAGIC: experimental number of spokes, depends on capabilities of CNC
+% TODO: calculate radius & position based on paperwidth & paperheight
+\siemenstar{9}{4}{10}{10}
+\siemenstar{9}{8}{10}{\height-10}
+\siemenstar{9}{16}{\width-10}{10}
 \siemenstar{9}{32}{\width-10}{\height-10}
 
 % MAGIC draw a white circle so that it's easier to print on paper

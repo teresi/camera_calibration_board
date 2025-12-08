@@ -1,0 +1,7 @@
+[ ] bugfix first siemen star spoke not getting drawn
+    [x] remove duplicate spoke
+    [ ] test new spoke pattern on CNC
+[ ] add required packages
+    [ ] add requirements file w/ names of required packages
+    [ ] add install rule to install requirements via tlmgr
+[ ] add example patterns to readme
