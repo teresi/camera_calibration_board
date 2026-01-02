@@ -106,15 +106,15 @@
 
 % MAGIC: experimental number of spokes, depends on capabilities of CNC, 45 is a commount count
 % TODO: calculate radius & position based on paperwidth & paperheight
-\siemenstar{\radius}{40}{\cx}{\cy}
+\siemenstar{\radius}{20}{\cx}{\cy}
 
 % fill the corners with smaller stars to fill the space and help us align the drawing to the card in the CNC bed
 % MAGIC: experimental number of spokes, depends on capabilities of CNC
 % TODO: calculate radius & position based on paperwidth & paperheight
-\siemenstar{9}{4}{10}{10}
-\siemenstar{9}{8}{10}{\height-10}
-\siemenstar{9}{16}{\width-10}{10}
-\siemenstar{9}{32}{\width-10}{\height-10}
+\siemenstar{9}{2}{10}{10}
+\siemenstar{9}{4}{10}{\height-10}
+\siemenstar{9}{8}{\width-10}{10}
+\siemenstar{9}{12}{\width-10}{\height-10}
 
 % MAGIC draw a white circle so that it's easier to print on paper
 %\filldraw[white] (\paperW/2, \paperH/2) circle (0.1pt);
