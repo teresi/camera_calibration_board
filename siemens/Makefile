@@ -1,50 +1,41 @@
 #!/usr/bin/make -f
 
 
-# Make calibration board w/ symmetric circles
+tex := $(wildcard *.tex)
+pdf := $(patsubst %.tex,%.pdf,$(tex))
+png := $(patsubst %.pdf,%.png,$(pdf))
+svg := $(patsubst %.pdf,%.svg,$(pdf))
 
-
-SHELL := /bin/bash
-
-_PROJECT := siemens_star
-_ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-
-SPOKES := 45
-WIDTH := 215.9
-HEIGHT := 279.4
-
-# default options for latexmk for pdflatex
-# https://tex.stackexchange.com/questions/205231/can-i-pass-latex-commands-to-latexmk-instead-of-a-filename
-_pdflatex_def := pdflatex %O -interaction=nonstopmode -synctex=1
-
-# pass options to geometry via pdflatex flag b/c we need this before \begin{document}
-_geometry_opts := \PassOptionsToPackage{paperwidth=$(WIDTH)mm,paperheight=$(HEIGHT)mm}{geometry}
-
-
-.PHONY: all clean
-.PHONY: $(_PROJECT).pdf  # delegate to latexmk b/c it needs run more than once for LaTeX
-
-# 		-pdflatex='pdflatex -interaction=nonstopmode -shell-escape "\newcommand\nSpokes{$(SPOKES)} \include{$(_PROJECT)}"' \
 
 .PHONY: all
-all: $(_PROJECT).pdf $(_PROJECT).svg $(_PROJECT).png
+all: $(pdf) $(png) $(svg)
 
 
-$(_PROJECT).pdf:
-	max_print_line=96 \
-	latexmk -pdf \
-		-pdflatex='$(_pdflatex_def) "$(_geometry_opts)\input{%S}"' \
-		$(_PROJECT)
+$(pdf): $(tex)
+
+
+$(png): $(pdf)
+
+
+$(svg): $(pdf)
+
 
 .PHONY: clean
 clean:
-	latexmk -C $(_PROJECT).tex
+	latexmk -C $(tex)
+	rm -rf *.pdf
+	rm -rf *.svg
+	rm -rf *.png
 
 
-$(_PROJECT).svg: $(_PROJECT).pdf
+%.pdf: %.tex
+	max_print_line=96 \
+	latexmk -pdf $<
+
+
+%.svg: %.pdf
 	pdf2svg $< $@
 
 
-$(_PROJECT).png: $(_PROJECT).pdf
-	# -r is DPI, experimental
-	pdftoppm $< $(basename $@) -png -singlefile -r 512
+%.png: %.pdf
+	pdftoppm $< $(basename $@) -png -singlefile

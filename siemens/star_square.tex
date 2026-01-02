@@ -1,0 +1,55 @@
+\documentclass{siemens_star}
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% in mm, but don't use units! it messes up TikZ
+\newcommand{\width}{304.8}  % 12inch = 304.8 mm
+\newcommand{\height}{304.8} % 12inch = 304.8 mm
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\setlength{\paperwidth}{\width mm}    % tell LaTeX the units for the page
+\setlength{\paperheight}{\height mm}  % tell LaTeX the units for the page
+
+% in mm, but don't use units! it messes up TikZ
+\pgfmathsetmacro{\paperW}{\width}
+\pgfmathsetmacro{\paperH}{\height}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+
+
+\begin{document}
+
+% printable area is *approximately* 11x19
+% so reduce
+
+\newcommand\cx{\width/2}
+\newcommand\cy{\height/2}
+\newcommand\radius{\height/2-25.4}  % MAGIC 1 inch margin
+
+
+\begin{tikzpicture}
+[%
+	x=1mm,
+	y=1mm,
+	overlay,
+	remember picture,
+	scale=1,
+	shift={(current page.south west)}
+]
+
+% center star
+%           radius spokes x y
+\siemenstar{\radius}{24}{\cx}{\cy}
+
+% stars in corners
+%\newcommand\radiussmol{25.4}
+%\siemenstar{16}{4}{16+25.4}{25.4+16}
+%\siemenstar{16}{8}{16+25.4}{\height-25.4-16}
+%\siemenstar{16}{12}{\width-25.4-16}{25.4+16}
+%\siemenstar{16}{16}{\width-25.4-16}{\height-25.4-16}
+
+\end{tikzpicture}%
+
+
+\end{document}
+\grid
